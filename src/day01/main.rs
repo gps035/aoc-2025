@@ -30,20 +30,11 @@ fn part2(input: &str) -> i32 {
         .fold(
             (start_position, 0),
             |(last_position, zero_count), movement| {
+                let direction = movement.signum();
                 let mut new_zero_count = zero_count;
                 let mut new_position = last_position;
                 for n in 0..movement.abs() {
-                    if movement < 0 {
-                        new_position -= 1
-                    } else {
-                        new_position += 1
-                    }
-                    if new_position == -1 {
-                        new_position = 99
-                    }
-                    if new_position == 100 {
-                        new_position = 0
-                    }
+                    new_position = (new_position + direction).rem_euclid(100);
                     if new_position == 0 {
                         new_zero_count += 1
                     }
