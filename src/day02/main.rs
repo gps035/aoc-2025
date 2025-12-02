@@ -4,12 +4,16 @@ fn main() {
     println!("Part 2: {}", part2(input));
 }
 
-fn part1(input: &str) -> i64 {
+fn all_ids(input: &str) -> impl Iterator<Item = i64> {
     input
         .split(",")
         .map(|range| range.split_once("-").unwrap())
         .map(|(start, end)| (start.parse::<i64>().unwrap(), end.parse::<i64>().unwrap()))
-        .flat_map(|(start, end)| start..end)
+        .flat_map(|(start, end)| start..=end)
+}
+
+fn part1(input: &str) -> i64 {
+    all_ids(input)
         .filter(|id| {
             let s = id.to_string();
             let mid = s.len() / 2;
@@ -18,6 +22,18 @@ fn part1(input: &str) -> i64 {
         .sum()
 }
 
-fn part2(_input: &str) -> i32 {
-    0
+fn part2(input: &str) -> i64 {
+    all_ids(input)
+        .filter(|id| {
+            let s = id.to_string();
+            let length = s.len();
+            for n in 1..=(length / 2) {
+                let expected = s[..n].repeat(length / n);
+                if expected == s {
+                    return true;
+                }
+            }
+            false
+        })
+        .sum()
 }
