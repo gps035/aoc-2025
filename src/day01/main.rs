@@ -29,17 +29,12 @@ fn part2(input: &str) -> i32 {
     parse_input(input)
         .fold(
             (start_position, 0),
-            |(last_position, zero_count), movement| {
-                let direction = movement.signum();
-                let mut new_zero_count = zero_count;
-                let mut new_position = last_position;
-                for n in 0..movement.abs() {
-                    new_position = (new_position + direction).rem_euclid(100);
-                    if new_position == 0 {
-                        new_zero_count += 1
-                    }
+            |(mut position, mut zero_count), movement| {
+                for _ in 0..movement.abs() {
+                    position = (position + movement.signum()).rem_euclid(100);
+                    zero_count += (position == 0) as i32
                 }
-                (new_position, new_zero_count)
+                (position, zero_count)
             },
         )
         .1
