@@ -4,30 +4,30 @@ fn main() {
     println!("Part 2: {}", part2(input));
 }
 
-fn part1(input: &str) -> i32 {
+fn pick_batteries(input: &str, battery_count: usize) -> impl Iterator<Item = i64> {
     input
         .split_terminator("\n")
-        .map(|bank| {
-            let mut initial = (0, '0');
-            for (i, c) in bank.chars().enumerate() {
-                if initial.1 == '9' || i == bank.len() - 1 {
-                    break;
-                }
-                if c > initial.1 {
-                    initial = (i, c);
-                }
-            }
-            let mut secondary = '0';
-            for (i, c) in bank[(initial.0 + 1)..].chars().enumerate() {
-                if c > secondary {
-                    secondary = c;
+        .map(move |bank| {
+            let mut next_possible_index = 0;
+            let mut chosen = vec!['0'; battery_count];
+            for x in 0..chosen.len() {
+                let start = next_possible_index;
+                let end = bank.len() - (chosen.len() - x);
+                for (i,c) in bank[start..=end].chars().enumerate() {
+                    if c > chosen[x] {
+                        next_possible_index = start +i+1;
+                        chosen[x] = c;
+                    }
                 }
             }
-            String::from_iter([initial.1, secondary])
-                .parse::<i32>()
+            String::from_iter(chosen)
+                .parse::<i64>()
                 .unwrap()
         })
-        .sum()
+}
+
+fn part1(input: &str) -> i64 {
+    return pick_batteries(input, 2).sum()
 }
 
 fn part2(_input: &str) -> i32 {
