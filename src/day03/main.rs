@@ -30,6 +30,6 @@ fn part1(input: &str) -> i64 {
     return pick_batteries(input, 2).sum()
 }
 
-fn part2(_input: &str) -> i32 {
-    0
+fn part2(input: &str) -> i64 {
+    return pick_batteries(input, 12).sum()
 }
