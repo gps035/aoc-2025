@@ -22,6 +22,18 @@ fn get_rows(input: &str) -> Vec<Vec<bool>> {
         .collect()
 }
 
+const NEIGHBOUR_OFFSETS: [(isize, isize); 8] = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    // (0, 0),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+];
+
 fn remove_accessible(rows: &Vec<Vec<bool>>) -> Vec<Vec<bool>> {
     rows.iter()
         .enumerate()
@@ -29,34 +41,15 @@ fn remove_accessible(rows: &Vec<Vec<bool>>) -> Vec<Vec<bool>> {
             row.iter()
                 .enumerate()
                 .map(|(col_idx, cell)| {
-                    let mut other_rows = Vec::from([row_idx]);
-                    if row_idx > 0 {
-                        other_rows.push(row_idx - 1);
-                    }
-                    if (row_idx + 1) < rows.len() {
-                        other_rows.push(row_idx + 1);
-                    }
-                    let mut other_cols = Vec::from([col_idx]);
-                    if col_idx > 0 {
-                        other_cols.push(col_idx - 1);
-                    }
-                    if (col_idx + 1) < row.len() {
-                        other_cols.push(col_idx + 1);
-                    }
-                    let mut surrounding_indexes = Vec::new();
-                    for r in &other_rows[..] {
-                        for c in &other_cols {
-                            if *r == row_idx && *c == col_idx {
-                                continue;
-                            }
-                            surrounding_indexes.push((*r, *c))
-                        }
-                    }
                     (
                         *cell,
-                        surrounding_indexes
-                            .into_iter()
-                            .filter(|(r, c)| rows[*r][*c])
+                        NEIGHBOUR_OFFSETS
+                            .iter()
+                            .filter_map(|(row_offset, col_offset)| {
+                                rows.get(row_idx.checked_add_signed(*row_offset)?)?
+                                    .get(col_idx.checked_add_signed(*col_offset)?)
+                            })
+                            .filter(|&&c| c)
                             .count(),
                     )
                 })
