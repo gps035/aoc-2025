@@ -15,17 +15,18 @@ fn main() {
     println!("Time elapsed: {:?}", end - start);
 }
 
-fn part1(input: &str) -> i32 {
-    let rows: Vec<Vec<bool>> = input
+fn get_rows(input: &str) -> Vec<Vec<bool>> {
+    input
         .split_terminator("\n")
         .map(|line| line.chars().map(|char| char == '@').collect())
-        .collect();
+        .collect()
+}
 
+fn remove_accessible(rows: &Vec<Vec<bool>>) -> Vec<Vec<bool>> {
     rows.iter()
         .enumerate()
         .map(|(row_idx, row)| {
-            let counts = row
-                .iter()
+            row.iter()
                 .enumerate()
                 .map(|(col_idx, cell)| {
                     let mut other_rows = Vec::from([row_idx]);
@@ -51,16 +52,31 @@ fn part1(input: &str) -> i32 {
                             surrounding_indexes.push((*r, *c))
                         }
                     }
-                    let count = surrounding_indexes
-                        .into_iter()
-                        .filter(|(r, c)| rows[*r][*c])
-                        .collect::<Vec<(usize, usize)>>();
-                    count.len() < 4 && *cell
+                    (
+                        *cell,
+                        surrounding_indexes
+                            .into_iter()
+                            .filter(|(r, c)| rows[*r][*c])
+                            .count(),
+                    )
                 })
-                .collect::<Vec<bool>>();
-            counts.into_iter().filter(|valid| *valid).count() as i32
+                .map(|(cell, surrounding)| cell && surrounding >= 4)
+                .collect()
         })
+        .collect()
+}
+
+fn count_paper(rows: &Vec<Vec<bool>>) -> i32 {
+    rows.iter()
+        .map(|row| row.iter().filter(|cell| **cell).count() as i32)
         .sum()
+}
+
+fn part1(input: &str) -> i32 {
+    let rows = get_rows(input);
+    let paper_count = count_paper(&rows);
+    let remaining = remove_accessible(&rows);
+    paper_count - count_paper(&remaining)
 }
 
 fn part2(_input: &str) -> i32 {
