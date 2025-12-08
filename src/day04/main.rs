@@ -79,6 +79,18 @@ fn part1(input: &str) -> i32 {
     paper_count - count_paper(&remaining)
 }
 
-fn part2(_input: &str) -> i32 {
-    0
+fn part2(input: &str) -> i32 {
+    let rows = get_rows(input);
+    let initial = count_paper(&rows);
+    let mut remaining = rows;
+    let mut remaining_count = initial;
+    loop {
+        let last = remaining_count;
+        remaining = remove_accessible(&remaining);
+        remaining_count = count_paper(&remaining);
+        if remaining_count == last {
+            break;
+        }
+    }
+    initial - remaining_count
 }
