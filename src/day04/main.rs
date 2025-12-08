@@ -15,7 +15,7 @@ fn main() {
     println!("Time elapsed: {:?}", end - start);
 }
 
-fn get_rows(input: &str) -> Vec<Vec<bool>> {
+fn get_grid(input: &str) -> Vec<Vec<bool>> {
     input
         .split_terminator("\n")
         .map(|line| line.chars().map(|char| char == '@').collect())
@@ -34,56 +34,47 @@ const NEIGHBOUR_OFFSETS: [(isize, isize); 8] = [
     (1, 1),
 ];
 
-fn remove_accessible(rows: &Vec<Vec<bool>>) -> Vec<Vec<bool>> {
-    rows.iter()
-        .enumerate()
-        .map(|(row_idx, row)| {
-            row.iter()
-                .enumerate()
-                .map(|(col_idx, cell)| {
-                    (
-                        *cell,
-                        NEIGHBOUR_OFFSETS
-                            .iter()
-                            .filter_map(|(row_offset, col_offset)| {
-                                rows.get(row_idx.checked_add_signed(*row_offset)?)?
-                                    .get(col_idx.checked_add_signed(*col_offset)?)
-                            })
-                            .filter(|&&c| c)
-                            .count(),
-                    )
+fn remove_accessible(mut grid: Vec<Vec<bool>>) -> (Vec<Vec<bool>>, i32) {
+    let mut to_remove = Vec::new();
+    for (row_idx, row) in grid.iter().enumerate() {
+        for (cell_idx, cell) in row.iter().enumerate() {
+            if ! *cell {
+                continue
+            }
+            if NEIGHBOUR_OFFSETS
+                .iter()
+                .filter_map(|(row_offset, col_offset)| {
+                    grid.get(row_idx.checked_add_signed(*row_offset)?)?
+                        .get(cell_idx.checked_add_signed(*col_offset)?)
                 })
-                .map(|(cell, surrounding)| cell && surrounding >= 4)
-                .collect()
-        })
-        .collect()
-}
-
-fn count_paper(rows: &Vec<Vec<bool>>) -> i32 {
-    rows.iter()
-        .map(|row| row.iter().filter(|cell| **cell).count() as i32)
-        .sum()
+                .filter(|&&c| c)
+                .count() <4 {
+                to_remove.push((row_idx, cell_idx))
+            }
+        }
+    }
+    for (row_idx, cell_idx) in to_remove.iter() {
+        grid[*row_idx][*cell_idx]  =false
+    }
+    (grid, to_remove.len() as i32)
 }
 
 fn part1(input: &str) -> i32 {
-    let rows = get_rows(input);
-    let paper_count = count_paper(&rows);
-    let remaining = remove_accessible(&rows);
-    paper_count - count_paper(&remaining)
+    let grid = get_grid(input);
+    let (_, removed_count) = remove_accessible(grid);
+    removed_count
 }
 
 fn part2(input: &str) -> i32 {
-    let rows = get_rows(input);
-    let initial = count_paper(&rows);
-    let mut remaining = rows;
-    let mut remaining_count = initial;
+    let mut grid = get_grid(input);
+    let mut total = 0;
     loop {
-        let last = remaining_count;
-        remaining = remove_accessible(&remaining);
-        remaining_count = count_paper(&remaining);
-        if remaining_count == last {
+        let (new, removed) = remove_accessible(grid);
+        grid = new;
+        if removed == 0 {
             break;
         }
+        total += removed
     }
-    initial - remaining_count
+    total
 }
