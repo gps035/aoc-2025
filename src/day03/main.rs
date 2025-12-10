@@ -1,17 +1,17 @@
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Instant};
 
 fn main() {
     let input = include_str!("input.txt");
-    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let start = Instant::now();
     println!("Part 1: {}", part1(input));
-    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let end = Instant::now();
     println!("Time elapsed: {:?}", end - start);
 
     println!("\n");
 
-    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let start = Instant::now();
     println!("Part 2: {}", part2(input));
-    let end = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    let end = Instant::now();
     println!("Time elapsed: {:?}", end - start);
 }
 
