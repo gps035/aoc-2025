@@ -35,28 +35,28 @@ const NEIGHBOUR_OFFSETS: [(isize, isize); 8] = [
 ];
 
 fn remove_accessible(mut grid: Vec<Vec<bool>>) -> (Vec<Vec<bool>>, i32) {
-    let mut to_remove = Vec::new();
-    for (row_idx, row) in grid.iter().enumerate() {
-        for (cell_idx, cell) in row.iter().enumerate() {
-            if ! *cell {
-                continue
+    let mut removed = 0;
+    for row_idx in 0..grid.len() {
+        for cell_idx in 0..grid[row_idx].len() {
+            if !grid[row_idx][cell_idx] {
+                continue;
             }
-            if NEIGHBOUR_OFFSETS
+            let neighbours = NEIGHBOUR_OFFSETS
                 .iter()
                 .filter_map(|(row_offset, col_offset)| {
                     grid.get(row_idx.checked_add_signed(*row_offset)?)?
                         .get(cell_idx.checked_add_signed(*col_offset)?)
                 })
                 .filter(|&&c| c)
-                .count() <4 {
-                to_remove.push((row_idx, cell_idx))
+                .count();
+            if neighbours >= 4 {
+                continue;
             }
+            grid[row_idx][cell_idx] = false;
+            removed += 1;
         }
     }
-    for (row_idx, cell_idx) in to_remove.iter() {
-        grid[*row_idx][*cell_idx]  =false
-    }
-    (grid, to_remove.len() as i32)
+    (grid, removed)
 }
 
 fn part1(input: &str) -> i32 {
