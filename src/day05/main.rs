@@ -1,18 +1,8 @@
-use std::time::{Instant};
+#[path = "../utilities.rs"]
+mod utilities;
 
 fn main() {
-    let input = include_str!("input.txt");
-    let start = Instant::now();
-    println!("Part 1: {}", part1(input));
-    let end = Instant::now();
-    println!("Time elapsed: {:?}", end - start);
-
-    println!("\n");
-
-    let start = Instant::now();
-    println!("Part 2: {}", part2(input));
-    let end = Instant::now();
-    println!("Time elapsed: {:?}", end - start);
+    utilities::run_solution(include_str!("input.txt"), part1, part2);
 }
 
 fn part1(_input: &str) -> i64 {
