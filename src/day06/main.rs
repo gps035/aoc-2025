@@ -6,56 +6,48 @@ fn main() {
 }
 
 fn part1(input: &str) -> i64 {
-    let mut lines = input
-        .split_terminator("\n")
-        .map(|line| line.split_whitespace().collect::<Vec<&str>>())
-        .collect::<Vec<Vec<&str>>>();
-    let operators = lines.pop().unwrap();
-    operators
+    let mut lines: Vec<Vec<&str>> = input
+        .lines()
+        .map(|line| line.split_whitespace().collect())
+        .collect();
+    lines
+        .pop()
+        .unwrap()
         .iter()
         .enumerate()
         .map(|(index, op)| {
-            let numbers = lines
-                .iter()
-                .map(|line| line[index])
-                .map(|item| item.parse::<i64>().unwrap());
-            if *op == "*" {
-                return numbers.product::<i64>();
-            }
-                return numbers.sum();
+            let numbers = lines.iter().map(|line| line[index].parse::<i64>().unwrap());
+            return if *op == "*" {
+                numbers.product::<i64>()
+            } else {
+                numbers.sum()
+            };
         })
         .sum()
 }
 
 fn part2(input: &str) -> i64 {
-    let lines = input
-        .split_terminator("\n")
-        .map(|line| line.as_bytes())
-        .collect::<Vec<&[u8]>>();
-    let mut sums = Vec::new();
-    let mut current_numbers = Vec::new();
+    let lines: Vec<&[u8]> = input.split_terminator("\n").map(str::as_bytes).collect();
+    let mut sum = 0;
+    let mut numbers = Vec::new();
     for index in (0..lines[0].len()).rev() {
-         let mut column = String::from_utf8(lines.iter().map(|line| {
-            (*line)[index]
-        }).collect::<Vec<u8>>()).unwrap();
-        if column.ends_with("*") {
-            column.pop();
-            current_numbers.push(column.trim().parse().unwrap());
-            sums.push(current_numbers.iter().product::<i64>());
-            current_numbers.clear();
-            continue
+        let column: String = lines.iter().map(|line| line[index] as char).collect();
+        let op = column.chars().last().unwrap();
+
+        let Ok(num) = column.trim_end_matches(['*', '+']).trim().parse::<i64>() else {
+            continue;
+        };
+        numbers.push(num);
+        if op == '*' {
+            sum += numbers.iter().product::<i64>();
+            numbers.clear();
+            continue;
         }
-        if column.ends_with("+") {
-            column.pop();
-            current_numbers.push(column.trim().parse().unwrap());
-            sums.push(current_numbers.iter().sum::<i64>());
-            current_numbers.clear();
-            continue
+        if op == '+' {
+            sum += numbers.iter().sum::<i64>();
+            numbers.clear();
+            continue;
         }
-        if column.trim().is_empty() {
-            continue
-        }
-        current_numbers.push(column.trim().parse().unwrap());
     }
-    sums.iter().sum()
+    sum
 }
