@@ -15,10 +15,10 @@ fn main() {
     println!("Time elapsed: {:?}", end - start);
 }
 
-fn part1(_input: &str) -> i32 {
+fn part1(_input: &str) -> i64 {
     0
 }
 
-fn part2(_input: &str) -> i32 {
+fn part2(_input: &str) -> i64 {
     0
 }

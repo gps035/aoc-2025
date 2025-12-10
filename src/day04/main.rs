@@ -34,7 +34,7 @@ const NEIGHBOUR_OFFSETS: [(isize, isize); 8] = [
     (1, 1),
 ];
 
-fn remove_accessible(mut grid: Vec<Vec<bool>>) -> (Vec<Vec<bool>>, i32) {
+fn remove_accessible(mut grid: Vec<Vec<bool>>) -> (Vec<Vec<bool>>, i64) {
     let mut removed = 0;
     for row_idx in 0..grid.len() {
         for cell_idx in 0..grid[row_idx].len() {
@@ -59,13 +59,13 @@ fn remove_accessible(mut grid: Vec<Vec<bool>>) -> (Vec<Vec<bool>>, i32) {
     (grid, removed)
 }
 
-fn part1(input: &str) -> i32 {
+fn part1(input: &str) -> i64 {
     let grid = get_grid(input);
     let (_, removed_count) = remove_accessible(grid);
     removed_count
 }
 
-fn part2(input: &str) -> i32 {
+fn part2(input: &str) -> i64 {
     let mut grid = get_grid(input);
     let mut total = 0;
     loop {

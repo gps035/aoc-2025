@@ -22,20 +22,20 @@ fn parse_input(input: &str) -> impl Iterator<Item = i32> {
     })
 }
 
-fn part1(input: &str) -> i32 {
+fn part1(input: &str) -> i64 {
     let start_position: i32 = 50;
     parse_input(input)
         .fold(
             (start_position, 0),
             |(last_position, zero_count), movement| {
                 let new_position = (last_position + movement).rem_euclid(100);
-                (new_position, zero_count + (new_position == 0) as i32)
+                (new_position, zero_count + (new_position == 0) as i64)
             },
         )
         .1
 }
 
-fn part2(input: &str) -> i32 {
+fn part2(input: &str) -> i64 {
     let start_position: i32 = 50;
     parse_input(input)
         .fold(
@@ -43,7 +43,7 @@ fn part2(input: &str) -> i32 {
             |(mut position, mut zero_count), movement| {
                 for _ in 0..movement.abs() {
                     position = (position + movement.signum()).rem_euclid(100);
-                    zero_count += (position == 0) as i32
+                    zero_count += (position == 0) as i64
                 }
                 (position, zero_count)
             },
