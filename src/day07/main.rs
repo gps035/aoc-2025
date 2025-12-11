@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[path = "../utilities.rs"]
 mod utilities;
@@ -7,8 +7,8 @@ fn main() {
     utilities::run_solution(include_str!("input.txt"), part1, part2);
 }
 
-fn get_start_column(lines: &Vec<&[u8]>) -> usize {
-    lines[0].iter().position(|&r| r == b'S').unwrap()
+fn get_start_column(line: &[u8]) -> usize {
+    line.iter().position(|&r| r == b'S').unwrap()
 }
 
 fn get_lines(input: &str) -> Vec<&[u8]> {
@@ -17,7 +17,7 @@ fn get_lines(input: &str) -> Vec<&[u8]> {
 
 fn part1(input: &str) -> i64 {
     let lines = get_lines(input);
-    let mut columns = HashSet::from([get_start_column(&lines)]);
+    let mut columns = HashSet::from([get_start_column(&lines[0])]);
     let mut splits = 0;
     for line in lines {
         let mut new_columns = HashSet::new();
@@ -36,33 +36,26 @@ fn part1(input: &str) -> i64 {
 }
 
 fn part2(input: &str) -> i64 {
-    let lines = get_lines(input);
+    let lines: Vec<&[u8]> = get_lines(input);
+    let rows = lines.len();
+    let columns = lines[0].len();
 
-    fn get_paths_to_bottom(
-        row: usize,
-        col: usize,
-        lines: &[&[u8]],
-        memo: &mut HashMap<(usize, usize), i64>,
-    ) -> i64 {
-        if lines.len() - 1 == row {
-            return 1;
+    let mut paths_to_bottom = vec![vec![0; columns]; rows];
+
+    for row in (0..rows).rev() {
+        for col in 0..columns {
+            let mut value = 1;
+            if row < rows - 1 {
+                let below = &paths_to_bottom[row + 1];
+                value = below[col];
+                if lines[row][col] == b'^' {
+                    value = below[col - 1] + below[col + 1];
+                }
+            }
+
+            paths_to_bottom[row][col] = value;
         }
-
-        if let Some(&known) = memo.get(&(row, col)) {
-            return known;
-        }
-
-        if lines[row][col] == b'^' {
-            let left = get_paths_to_bottom(row + 1, col - 1, lines, memo);
-            let right = get_paths_to_bottom(row + 1, col + 1, lines, memo);
-            let result = left + right;
-            memo.insert((row, col), result);
-            return result;
-        }
-
-        let result = get_paths_to_bottom(row + 1, col, lines, memo);
-        memo.insert((row, col), result);
-        result
     }
-    get_paths_to_bottom(0, get_start_column(&lines), &lines, &mut (HashMap::new()))
+
+    paths_to_bottom[0][get_start_column(lines[0])]
 }
